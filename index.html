@@ -507,6 +507,111 @@
   .toast.show { opacity: 1; }
 
   .no-data { text-align:center; color:var(--text2); padding:40px 16px; font-size:14px; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 300;
+    height: 58px;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 2px; cursor: pointer;
+    color: var(--text2); font-size: 10px;
+    font-family: 'Hind Siliguri', sans-serif;
+    transition: all 0.2s;
+    border: none; background: none;
+    padding: 6px 0;
+  }
+  .nav-item .nav-icon { font-size: 20px; }
+  .nav-item.active { color: var(--accent); }
+  .nav-item.active .nav-icon { transform: scale(1.15); }
+
+  /* ===== TABS ===== */
+  .tab-page { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 70px; }
+  .tab-page.active { display: flex; }
+
+  /* Asset page */
+  .asset-section { padding: 12px; }
+  .asset-section-title {
+    font-size: 13px; color: var(--text2);
+    margin-bottom: 8px; padding-left: 4px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .asset-card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    animation: slideIn 0.25s ease;
+  }
+  .asset-card-top {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; margin-bottom: 8px;
+  }
+  .asset-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .asset-badge {
+    font-size: 10px; padding: 3px 9px;
+    border-radius: 10px; font-weight: 600;
+  }
+  .badge-active { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid var(--green); }
+  .badge-expired { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid var(--red); }
+  .badge-land { background: rgba(52,152,219,0.15); color: var(--blue); border: 1px solid var(--blue); }
+  .badge-other { background: rgba(155,89,182,0.15); color: var(--purple); border: 1px solid var(--purple); }
+
+  .asset-rows { display: flex; flex-direction: column; gap: 4px; }
+  .asset-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .asset-row:last-child { border-bottom: none; }
+  .asset-row-label { color: var(--text2); }
+  .asset-row-val { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; }
+
+  .asset-footer {
+    display: flex; justify-content: flex-end;
+    gap: 8px; margin-top: 10px;
+  }
+  .asset-type-tabs {
+    display: flex; gap: 8px;
+    padding: 10px 12px;
+    overflow-x: auto; scrollbar-width: none;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+  .asset-type-tabs::-webkit-scrollbar { display: none; }
+  .asset-tab-btn {
+    white-space: nowrap; padding: 6px 14px;
+    border-radius: 20px; border: 1.5px solid var(--border);
+    background: var(--bg3); color: var(--text2);
+    font-size: 12px; font-family: 'Hind Siliguri', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .asset-tab-btn.active {
+    background: var(--accent); color: #000;
+    border-color: var(--accent); font-weight: 600;
+  }
+  .asset-summary {
+    display: flex; gap: 0;
+    background: var(--bg2);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .asset-sum-item { flex: 1; text-align: center; border-right: 1px solid var(--border); }
+  .asset-sum-item:last-child { border-right: none; }
+  .asset-sum-num { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .asset-sum-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+  /* expiry warning */
+  .expiry-warn { color: #e67e22; }
+  .expiry-ok { color: var(--green); }
+
 </style>
 </head>
 <body>
@@ -542,6 +647,7 @@
 
 <!-- APP SCREEN -->
 <div id="appScreen">
+<div class="tab-page active" id="page-notes">
   <div class="header">
     <div class="header-top">
       <div class="header-title">
@@ -574,6 +680,106 @@
 
   <button class="fab" onclick="openAddModal()">+</button>
 </div>
+
+</div><!-- end page-notes -->
+
+
+<!-- ASSET PAGE -->
+<div class="tab-page" id="page-assets">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-title">
+        <span class="icon">💰</span>
+        আমার সম্পদ
+        <span class="watermark">@A.M.MORSHED</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openBackupModal()" title="ব্যাকআপ">💾</button>
+        <button class="icon-btn" onclick="openPinChangeModal()" title="PIN">🔐</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="asset-summary">
+    <div class="asset-sum-item">
+      <div class="asset-sum-num" id="sumFdr">0</div>
+      <div class="asset-sum-label">FDR/সঞ্চয়পত্র</div>
+    </div>
+    <div class="asset-sum-item">
+      <div class="asset-sum-num" id="sumLand">0</div>
+      <div class="asset-sum-label">জমিজমা</div>
+    </div>
+    <div class="asset-sum-item">
+      <div class="asset-sum-num" id="sumOther">0</div>
+      <div class="asset-sum-label">অন্যান্য</div>
+    </div>
+  </div>
+
+  <div class="asset-type-tabs">
+    <button class="asset-tab-btn active" onclick="setAssetFilter('সব')">📁 সব</button>
+    <button class="asset-tab-btn" onclick="setAssetFilter('FDR/সঞ্চয়পত্র')">💳 FDR/সঞ্চয়পত্র</button>
+    <button class="asset-tab-btn" onclick="setAssetFilter('জমিজমা')">🏠 জমিজমা</button>
+    <button class="asset-tab-btn" onclick="setAssetFilter('অন্যান্য')">📦 অন্যান্য</button>
+  </div>
+
+  <div class="asset-section" id="assetList"></div>
+
+  <button class="fab" onclick="openAssetAddModal()">+</button>
+</div>
+
+<!-- ASSET ADD/EDIT MODAL -->
+<div class="modal-overlay" id="assetModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="assetModalTitle">নতুন সম্পদ</div>
+
+    <div class="form-group">
+      <label class="form-label">সম্পদের ধরন</label>
+      <select class="form-select" id="assetType" onchange="renderAssetFields()">
+        <option value="FDR/সঞ্চয়পত্র">💳 FDR/সঞ্চয়পত্র</option>
+        <option value="জমিজমা">🏠 জমিজমা</option>
+        <option value="অন্যান্য">📦 অন্যান্য</option>
+      </select>
+    </div>
+
+    <div id="assetDynamicFields"></div>
+
+    <div class="form-group">
+      <label class="form-label">অতিরিক্ত নোট</label>
+      <textarea class="form-textarea" id="assetNote" placeholder="যেকোনো অতিরিক্ত তথ্য..." style="min-height:70px;"></textarea>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeAssetModal()">বাতিল</button>
+      <button class="btn btn-primary" onclick="saveAsset()">সংরক্ষণ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ASSET VIEW MODAL -->
+<div class="modal-overlay" id="assetViewModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="assetViewContent"></div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="btn btn-secondary" onclick="closeModal('assetViewModal')">বন্ধ করুন</button>
+      <button class="btn btn-primary" onclick="editAssetFromView()">✏️ এডিট</button>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="nav-item active" id="nav-notes" onclick="switchTab('notes')">
+      <span class="nav-icon">📝</span>নোট
+    </button>
+    <button class="nav-item" id="nav-assets" onclick="switchTab('assets')">
+      <span class="nav-icon">💰</span>সম্পদ
+    </button>
+  </div>
+
 
 <!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="noteModal">
@@ -999,7 +1205,7 @@ function dropPin() {
   const idx = notes.findIndex(n => n.id === dropdownNoteId);
   if (idx >= 0) {
     notes[idx].pinned = !notes[idx].pinned;
-    saveData(); renderAll();
+    saveAllData(); renderAll();
     showToast(notes[idx].pinned ? 'পিন করা হয়েছে 📌' : 'পিন সরানো হয়েছে');
   }
   document.getElementById('dropdown').classList.remove('open');
@@ -1053,7 +1259,7 @@ function closeConfirm() {
 
 function confirmDelete() {
   notes = notes.filter(n => n.id !== deleteNoteId);
-  saveData(); renderAll();
+  saveAllData(); renderAll();
   closeConfirm();
   showToast('নোট মুছে ফেলা হয়েছে 🗑️');
 }
@@ -1080,7 +1286,7 @@ function addCategory() {
   if (categories.includes(val)) { showToast('এই ক্যাটাগরি আগেই আছে'); return; }
   categories.push(val);
   document.getElementById('newCatInput').value = '';
-  saveData(); renderCatList(); renderCatFilter();
+  saveAllData(); renderCatList(); renderCatFilter();
   showToast('ক্যাটাগরি যোগ হয়েছে ✓');
 }
 
@@ -1089,7 +1295,7 @@ function deleteCat(i) {
   const inUse = notes.some(n => n.category === cat);
   if (inUse) { showToast('এই ক্যাটাগরি নোটে ব্যবহৃত — মুছতে পারবেন না'); return; }
   categories.splice(i, 1);
-  saveData(); renderCatList(); renderCatFilter();
+  saveAllData(); renderCatList(); renderCatFilter();
   showToast('ক্যাটাগরি মুছে ফেলা হয়েছে');
 }
 
@@ -1165,7 +1371,7 @@ function importData(e) {
       data.categories.forEach(c => {
         if (!categories.includes(c)) categories.push(c);
       });
-      saveData(); renderAll();
+      saveAllData(); renderAll();
       closeBackupModal();
       showToast(added + 'টি নোট Import হয়েছে ✓');
     } catch(err) {
@@ -1212,11 +1418,310 @@ function escHtml(str) {
 }
 
 // Close modals on overlay click
-['noteModal','viewModal','catModal','pinChangeModal','backupModal'].forEach(id => {
+['noteModal','viewModal','catModal','pinChangeModal','backupModal','assetModal','assetViewModal'].forEach(id => {
   document.getElementById(id).addEventListener('click', function(e) {
     if (e.target === this) closeModal(id);
   });
 });
+
+
+// ===== ASSETS =====
+let assets = JSON.parse(localStorage.getItem('mn_assets') || '[]');
+let assetFilter = 'সব';
+let editingAssetId = null;
+let viewingAssetId = null;
+
+const FDR_FIELDS = [
+  {id:'assetName', label:'নাম / বিবরণ', type:'text', placeholder:'যেমন: সোনালী ব্যাংক FDR'},
+  {id:'assetAccNo', label:'অ্যাকাউন্ট / সনদ নম্বর', type:'text', placeholder:''},
+  {id:'assetBank', label:'ব্যাংক / প্রতিষ্ঠানের নাম', type:'text', placeholder:''},
+  {id:'assetAmount', label:'টাকার পরিমাণ (৳)', type:'number', placeholder:''},
+  {id:'assetRate', label:'মুনাফার হার (%)', type:'number', placeholder:''},
+  {id:'assetOpen', label:'Opening তারিখ', type:'date', placeholder:''},
+  {id:'assetExpiry', label:'Expiry তারিখ', type:'date', placeholder:''},
+  {id:'assetStatus', label:'স্ট্যাটাস', type:'select', options:['চালু','মেয়াদোত্তীর্ণ','নবায়িত']},
+];
+
+const LAND_FIELDS = [
+  {id:'assetName', label:'জমির বিবরণ', type:'text', placeholder:'যেমন: উত্তর পাড়ার বাড়ি'},
+  {id:'assetLandType', label:'জমির ধরন', type:'select', options:['কৃষি জমি','বাড়ি/ভিটা','প্লট','অন্যান্য']},
+  {id:'assetLocation', label:'অবস্থান / ঠিকানা', type:'text', placeholder:'গ্রাম, উপজেলা, জেলা'},
+  {id:'assetMouza', label:'মৌজা', type:'text', placeholder:''},
+  {id:'assetKhatian', label:'খতিয়ান নম্বর', type:'text', placeholder:''},
+  {id:'assetDag', label:'দাগ নম্বর', type:'text', placeholder:''},
+  {id:'assetDeed', label:'দলিল নম্বর', type:'text', placeholder:''},
+  {id:'assetArea', label:'পরিমাণ', type:'text', placeholder:'যেমন: ৩৩ শতক / ২ কাঠা'},
+  {id:'assetBuyPrice', label:'ক্রয়মূল্য (৳)', type:'number', placeholder:''},
+  {id:'assetBuyDate', label:'ক্রয়ের তারিখ', type:'date', placeholder:''},
+  {id:'assetCurrentVal', label:'বর্তমান আনুমানিক মূল্য (৳)', type:'number', placeholder:''},
+];
+
+const OTHER_FIELDS = [
+  {id:'assetName', label:'নাম / বিবরণ', type:'text', placeholder:''},
+  {id:'assetSubType', label:'ধরন', type:'text', placeholder:'যেমন: গাড়ি, গহনা, শেয়ার...'},
+  {id:'assetAmount', label:'মূল্য / পরিমাণ', type:'text', placeholder:''},
+  {id:'assetDate', label:'তারিখ', type:'date', placeholder:''},
+];
+
+function renderAssetFields() {
+  const type = document.getElementById('assetType').value;
+  const fields = type === 'FDR/সঞ্চয়পত্র' ? FDR_FIELDS : type === 'জমিজমা' ? LAND_FIELDS : OTHER_FIELDS;
+  let html = '';
+  fields.forEach(f => {
+    html += '<div class="form-group"><label class="form-label">' + f.label + '</label>';
+    if (f.type === 'select') {
+      html += '<select class="form-select" id="' + f.id + '">';
+      f.options.forEach(o => html += '<option>' + o + '</option>');
+      html += '</select>';
+    } else {
+      html += '<input type="' + f.type + '" class="form-input" id="' + f.id + '" placeholder="' + (f.placeholder||'') + '">';
+    }
+    html += '</div>';
+  });
+  document.getElementById('assetDynamicFields').innerHTML = html;
+  // restore editing values
+  if (editingAssetId) {
+    const a = assets.find(x => x.id === editingAssetId);
+    if (a && a.fields) {
+      Object.keys(a.fields).forEach(k => {
+        const el = document.getElementById(k);
+        if (el) el.value = a.fields[k] || '';
+      });
+    }
+  }
+}
+
+function openAssetAddModal() {
+  editingAssetId = null;
+  document.getElementById('assetModalTitle').textContent = 'নতুন সম্পদ';
+  document.getElementById('assetType').value = 'FDR/সঞ্চয়পত্র';
+  document.getElementById('assetNote').value = '';
+  renderAssetFields();
+  openModal('assetModal');
+}
+
+function openAssetEditModal(id) {
+  const a = assets.find(x => x.id === id);
+  if (!a) return;
+  editingAssetId = id;
+  document.getElementById('assetModalTitle').textContent = 'সম্পদ এডিট';
+  document.getElementById('assetType').value = a.type;
+  document.getElementById('assetNote').value = a.note || '';
+  renderAssetFields();
+  openModal('assetModal');
+}
+
+function closeAssetModal() { closeModal('assetModal'); editingAssetId = null; }
+
+function saveAsset() {
+  const type = document.getElementById('assetType').value;
+  const note = document.getElementById('assetNote').value.trim();
+  const fields = type === 'FDR/সঞ্চয়পত্র' ? FDR_FIELDS : type === 'জমিজমা' ? LAND_FIELDS : OTHER_FIELDS;
+
+  const nameEl = document.getElementById('assetName');
+  if (!nameEl || !nameEl.value.trim()) { showToast('নাম/বিবরণ লিখুন'); return; }
+
+  const fieldData = {};
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    if (el) fieldData[f.id] = el.value;
+  });
+
+  if (editingAssetId) {
+    const idx = assets.findIndex(x => x.id === editingAssetId);
+    if (idx >= 0) assets[idx] = {...assets[idx], type, fields: fieldData, note, updated: new Date().toISOString()};
+  } else {
+    assets.unshift({
+      id: Date.now().toString(),
+      type, fields: fieldData, note,
+      date: new Date().toISOString()
+    });
+  }
+  saveAllData(); closeAssetModal(); renderAssets();
+  showToast('সম্পদ সংরক্ষিত হয়েছে ✓');
+}
+
+function setAssetFilter(f) {
+  assetFilter = f;
+  document.querySelectorAll('.asset-tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(f) || (f==='সব' && b.textContent.includes('সব')));
+  });
+  renderAssets();
+}
+
+function renderAssets() {
+  let filtered = assetFilter === 'সব' ? assets : assets.filter(a => a.type === assetFilter);
+  const el = document.getElementById('assetList');
+
+  // summary
+  document.getElementById('sumFdr').textContent = assets.filter(a=>a.type==='FDR/সঞ্চয়পত্র').length;
+  document.getElementById('sumLand').textContent = assets.filter(a=>a.type==='জমিজমা').length;
+  document.getElementById('sumOther').textContent = assets.filter(a=>a.type==='অন্যান্য').length;
+
+  if (filtered.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="emoji">📭</div><p>কোনো সম্পদ নেই</p></div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(a => {
+    const f = a.fields || {};
+    let rows = '';
+    let badge = '';
+    let icon = '📦';
+
+    if (a.type === 'FDR/সঞ্চয়পত্র') {
+      icon = '💳';
+      const status = f.assetStatus || 'চালু';
+      const badgeCls = status === 'চালু' ? 'badge-active' : 'badge-expired';
+      badge = '<span class="asset-badge ' + badgeCls + '">' + status + '</span>';
+      if (f.assetAccNo) rows += row('অ্যাকাউন্ট নম্বর', f.assetAccNo);
+      if (f.assetBank) rows += row('ব্যাংক', f.assetBank);
+      if (f.assetAmount) rows += row('পরিমাণ', '৳ ' + Number(f.assetAmount).toLocaleString('bn-BD'));
+      if (f.assetRate) rows += row('মুনাফা', f.assetRate + '%');
+      if (f.assetOpen) rows += row('Opening', formatDateShort(f.assetOpen));
+      if (f.assetExpiry) {
+        const daysLeft = Math.ceil((new Date(f.assetExpiry) - new Date()) / 86400000);
+        const cls = daysLeft < 30 ? 'expiry-warn' : daysLeft < 0 ? '' : 'expiry-ok';
+        const txt = daysLeft < 0 ? 'মেয়াদ শেষ' : daysLeft + ' দিন বাকি';
+        rows += row('Expiry', '<span class="' + cls + '">' + formatDateShort(f.assetExpiry) + ' (' + txt + ')</span>');
+      }
+    } else if (a.type === 'জমিজমা') {
+      icon = '🏠';
+      badge = '<span class="asset-badge badge-land">' + (f.assetLandType||'জমি') + '</span>';
+      if (f.assetLocation) rows += row('অবস্থান', f.assetLocation);
+      if (f.assetMouza) rows += row('মৌজা', f.assetMouza);
+      if (f.assetKhatian) rows += row('খতিয়ান', f.assetKhatian);
+      if (f.assetDag) rows += row('দাগ নম্বর', f.assetDag);
+      if (f.assetDeed) rows += row('দলিল নম্বর', f.assetDeed);
+      if (f.assetArea) rows += row('পরিমাণ', f.assetArea);
+      if (f.assetBuyPrice) rows += row('ক্রয়মূল্য', '৳ ' + Number(f.assetBuyPrice).toLocaleString('bn-BD'));
+      if (f.assetCurrentVal) rows += row('বর্তমান মূল্য', '৳ ' + Number(f.assetCurrentVal).toLocaleString('bn-BD'));
+    } else {
+      icon = '📦';
+      badge = '<span class="asset-badge badge-other">' + (f.assetSubType||'অন্যান্য') + '</span>';
+      if (f.assetAmount) rows += row('মূল্য/পরিমাণ', f.assetAmount);
+      if (f.assetDate) rows += row('তারিখ', formatDateShort(f.assetDate));
+    }
+
+    return `<div class="asset-card">
+      <div class="asset-card-top">
+        <div class="asset-title">${icon} ${escHtml(f.assetName || a.type)}</div>
+        ${badge}
+      </div>
+      <div class="asset-rows">${rows}</div>
+      ${a.note ? '<div style="font-size:12px;color:var(--text2);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📌 ' + escHtml(a.note) + '</div>' : ''}
+      <div class="asset-footer">
+        <button class="note-act-btn" onclick="openAssetView('${a.id}')">👁️</button>
+        <button class="note-act-btn" onclick="openAssetEditModal('${a.id}')">✏️</button>
+        <button class="note-act-btn danger" onclick="deleteAsset('${a.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function row(label, val) {
+  return '<div class="asset-row"><span class="asset-row-label">' + label + '</span><span class="asset-row-val">' + val + '</span></div>';
+}
+
+function openAssetView(id) {
+  const a = assets.find(x => x.id === id);
+  if (!a) return;
+  viewingAssetId = id;
+  const f = a.fields || {};
+  const fields = a.type === 'FDR/সঞ্চয়পত্র' ? FDR_FIELDS : a.type === 'জমিজমা' ? LAND_FIELDS : OTHER_FIELDS;
+  let rows = '';
+  fields.forEach(fi => {
+    if (f[fi.id]) rows += row(fi.label, escHtml(f[fi.id]));
+  });
+  if (a.note) rows += row('নোট', escHtml(a.note));
+  document.getElementById('assetViewContent').innerHTML =
+    '<div class="view-note-title">' + escHtml(f.assetName || a.type) + '</div>' +
+    '<div class="view-note-body" style="padding:0;background:none;">' +
+    '<div class="asset-rows">' + rows + '</div></div>';
+  openModal('assetViewModal');
+}
+
+function editAssetFromView() {
+  closeModal('assetViewModal');
+  setTimeout(() => openAssetEditModal(viewingAssetId), 100);
+}
+
+function deleteAsset(id) {
+  assets = assets.filter(a => a.id !== id);
+  saveAllData(); renderAssets();
+  showToast('সম্পদ মুছে ফেলা হয়েছে 🗑️');
+}
+
+function formatDateShort(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  const months = ['জানু','ফেব্রু','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টে','অক্টো','নভে','ডিসে'];
+  return dt.getDate() + ' ' + months[dt.getMonth()] + ', ' + dt.getFullYear();
+}
+
+// Tab switching
+function switchTab(tab) {
+  ['notes','assets'].forEach(t => {
+    document.getElementById('nav-' + t).classList.toggle('active', t === tab);
+  });
+  document.getElementById('page-notes').classList.toggle('active', tab === 'notes');
+  document.getElementById('page-assets').classList.toggle('active', tab === 'assets');
+  if (tab === 'assets') renderAssets();
+}
+
+// Override saveData to also save assets
+function saveAllData() {
+  localStorage.setItem('mn_notes', JSON.stringify(notes));
+  localStorage.setItem('mn_cats', JSON.stringify(categories));
+  localStorage.setItem('mn_assets', JSON.stringify(assets));
+}
+
+// Override export to include assets
+function exportData() {
+  const data = {
+    version: 2,
+    exported: new Date().toISOString(),
+    notes: notes,
+    categories: categories,
+    assets: assets
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date();
+  const fname = 'MyNotes_backup_' + date.getFullYear() + (date.getMonth()+1).toString().padStart(2,'0') + date.getDate().toString().padStart(2,'0') + '.json';
+  a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('Export সফল হয়েছে 📤');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.notes || !data.categories) { showToast('ফাইলটি সঠিক নয়!'); return; }
+      const existingIds = new Set(notes.map(n => n.id));
+      let added = 0;
+      data.notes.forEach(n => { if (!existingIds.has(n.id)) { notes.push(n); added++; } });
+      data.categories.forEach(c => { if (!categories.includes(c)) categories.push(c); });
+      if (data.assets) {
+        const existingAIds = new Set(assets.map(a => a.id));
+        (data.assets || []).forEach(a => { if (!existingAIds.has(a.id)) assets.push(a); });
+      }
+      saveAllData(); renderAll(); renderAssets();
+      closeBackupModal();
+      showToast(added + 'টি নোট Import হয়েছে ✓');
+    } catch(err) { showToast('Import ব্যর্থ হয়েছে!'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
 
 // ===== INIT =====
 initPin();
