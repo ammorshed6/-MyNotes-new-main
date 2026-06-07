@@ -677,6 +677,7 @@
 <div class="dropdown" id="dropdown">
   <div class="dropdown-item" onclick="dropPin()">📌 পিন / আনপিন</div>
   <div class="dropdown-item" onclick="dropEdit()">✏️ এডিট</div>
+  <div class="dropdown-item" onclick="dropCopy()">📋 কপি করুন</div>
   <div class="dropdown-item danger" onclick="dropDelete()">🗑️ মুছে ফেলুন</div>
 </div>
 
@@ -977,6 +978,36 @@ function dropPin() {
 function dropEdit() {
   document.getElementById('dropdown').classList.remove('open');
   openEditModal(dropdownNoteId);
+}
+
+function dropCopy() {
+  document.getElementById('dropdown').classList.remove('open');
+  const n = notes.find(x => x.id === dropdownNoteId);
+  if (!n) return;
+  const text = (n.title ? n.title + '\n\n' : '') + (n.body || '');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('নোট কপি হয়েছে 📋');
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try {
+    document.execCommand('copy');
+    showToast('নোট কপি হয়েছে 📋');
+  } catch(e) {
+    showToast('কপি করা যায়নি');
+  }
+  document.body.removeChild(ta);
 }
 
 function dropDelete() {
